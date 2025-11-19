@@ -2,26 +2,33 @@ class CommentsController < ApplicationController
   before_action :authenticate_user!
 
   def create
-    @post = Post.find(params[:post_id])
+    @post = Post.find_by(id: params[:post_id])
     @comment = @post.comments.build(comment_params)
     @comment.user = current_user
 
     if @comment.save
-      redirect_to @post, notice: "Comment added!"
+      redirect_to @post 
     else
       redirect_to @post, alert: "Comment cannot be blank."
     end
   end
-
   def destroy
-    @comment = Comment.find(params[:id])
-    
-    # Optional: only allow user or admin to delete
-    if @comment.user == current_user
-      @comment.destroy
-      redirect_to @comment.post, notice: "Comment deleted."
+    @comment = Comment.find_by(id: params[:id])
+
+    unless @comment
+      redirect_back fallback_location: root_path, alert: "Comment not found."
+      return #required because redirect_back doesnt return 
+    end
+
+    unless @comment.user == current_user
+      redirect_to @comment.post, alert: "You are not authorized to delete this comment."
+      return
+    end
+
+    if @comment.destroy
+      redirect_to @comment.post, notice: "Comment deleted successfully."
     else
-      redirect_to @comment.post, alert: "Not authorized!"
+      redirect_to @comment.post, alert: "Something went wrong. Could not delete comment."
     end
   end
 

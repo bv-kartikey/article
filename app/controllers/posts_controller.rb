@@ -1,50 +1,62 @@
 class PostsController < ApplicationController
-before_action :authenticate_user!, except: [:index, :show]
 
-  def index 
-    @posts = Post.all 
+# before action
+before_action :authenticate_user!, except:[ :index, :show]
+before_action :load_post, only: [:show, :edit, :update, :destroy]
+
+
+
+
+# handlers
+
+  def index
+    @posts = Post.all
   end
 
-  def show 
-    @post = Post.find(params[:id])
+  def show
   end
-
+  
   def new
-    @post = Post.new    
+    @post= Post.new
   end
-
+  
   def create
-  @post = current_user.posts.new(post_params)
+    @post = current_user.posts.new(post_params)
 
-  if @post.save
-    redirect_to @post
-  else
-    render :new
+    if @post.save
+      redirect_to @post
+    else
+      render :new, status: :unprocessable_entity
+    end
   end
-  end
-
+  
   def edit
-    @post = Post.find(params[:id])
   end
 
   def update
-  @post = current_user.posts.find(params[:id])   
-
-  if @post.update(post_params)
-    redirect_to @post
-  else
-    render :edit
-  end
+    if @post.update(post_params)
+      redirect_to @post
+    else
+      render :edit, status: :unprocessable_entity
+    end
   end
   
   def destroy
-    @post = Post.find(params[:id])
     @post.destroy
     redirect_to posts_path, notice: "Post Deleted"
   end
 
+
+
   private 
 
+  def load_post
+    @post = Post.find_by(id: params[:id])
+
+    if(@post.nil?)
+      redirect_to posts_path, alert: "Page not founds"
+    end
+  end
   def post_params
     params.require(:post).permit(:title, :body)
   end
