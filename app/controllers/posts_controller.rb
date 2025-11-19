@@ -14,13 +14,13 @@ before_action :authenticate_user!, except: [:index, :show]
   end
 
   def create
-    @post = Post.new(post_params)
+  @post = current_user.posts.new(post_params)
 
-    if @post.save
-      redirect_to @post
-    else
-      render :new
-    end
+  if @post.save
+    redirect_to @post
+  else
+    render :new
+  end
   end
 
   def edit
@@ -28,13 +28,13 @@ before_action :authenticate_user!, except: [:index, :show]
   end
 
   def update
-    @post = Post.find(params[:id])
+  @post = current_user.posts.find(params[:id])   
 
-    if @post.update(post_params)
-      redirect_to @post
-    else
-      render :edit
-    end
+  if @post.update(post_params)
+    redirect_to @post
+  else
+    render :edit
+  end
   end
   
   def destroy
