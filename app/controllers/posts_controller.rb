@@ -51,9 +51,9 @@ before_action :load_post, only: [:show, :edit, :update, :destroy]
   private 
 
   def load_post
-    @post = Post.find_by(id: params[:id])
+    @post = current.posts.find_by(id: params[:id])
 
-    if(@post.nil?)
+    if @post.nil?
       redirect_to posts_path, alert: "Page not founds"
     end
   end
