@@ -12,6 +12,8 @@ class CommentsController < ApplicationController
       redirect_to @post, alert: "Comment cannot be blank."
     end
   end
+
+  
   def destroy
     @comment = Comment.find_by(id: params[:id])
 
